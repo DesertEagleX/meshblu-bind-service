@@ -3,6 +3,7 @@ _ = require 'lodash'
 validator = require 'validator'
 url = require 'url'
 path = require('path')
+join = require('path').join;
 fs = require 'fs'
 
 class DeviceController
@@ -43,7 +44,22 @@ class DeviceController
 
   registerDevices: (request, response) =>
     num = request.body.num
-    @i_count = 501
+    fileNames = @findSync './app/uuid_and_token'
+    if fileNames.length == 0
+      @i_count = 1
+    else if  fileNames.length == 1
+      @i_count = 2
+    else
+      fileNums = []
+      for i in [0..fileNames.length-1]
+        tempNum = fileNames[i].slice(0,-4) * 1
+        fileNums.push tempNum
+      for i in [0..fileNums.length-1]
+        if fileNums[i]>fileNums[i+1]
+          temp = fileNums[i]
+          fileNums[i] = fileNums[i+1]
+          fileNums[i+1] = temp
+      @i_count = fileNums[fileNums.length-1] + 1
     return response.status(422).send Error: 'number required' if _.isEmpty(num)
     console.log num
     for i in [0..num-1]
@@ -57,6 +73,19 @@ class DeviceController
         fs.writeFileSync filePath,option
         @i_count++
     return response.status(200).send Info: 'register success'
+
+  findSync: (startPath) =>
+    @result=[]
+    @finder startPath
+    @result
+
+  finder: (path)=>
+    files=fs.readdirSync path
+    files.forEach (val,index) =>
+      fPath=join path,val
+      stats=fs.statSync fPath
+      finder fPath if stats.isDirectory() 
+      @result.push val if stats.isFile()
 
   update: (request, response) =>
     {userUuid, deviceUuid} = request
