@@ -10,10 +10,10 @@ sendError          = require 'express-send-error'
 Routes             = require './app/routes'
 fs                 = require 'fs'
 
-meshbluJSONPath = '/data/meshblu-bind-service/meshblu.json'
+meshbluJSONPath = './meshblu.json'
 if !fs.existsSync(meshbluJSONPath)
-  fs.writeFileSync '/data/meshblu-bind-service/meshblu.json', fs.readFileSync('/data/meshblu-authenticator-email-password-2.0.13/meshblu.json') 
-
+  #fs.writeFileSync '/data/meshblu-bind-service/meshblu.json', fs.readFileSync('/data/meshblu-authenticator-email-password-2.0.13/meshblu.json') 
+  console.log "require meshblu.json"
 try
   meshbluJSON  = require './meshblu.json'
 catch
